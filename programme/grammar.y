@@ -1,21 +1,22 @@
 %{ 
-
 #include <stdio.h>
 
 %}
 
 // Tokens from homework 4
-%token		/* Keywords */ PROGRAM, VAR, INTEGER, ARRAY,  OF, REAL, BOOLEAN, _BEGIN, /* BEGIN is already a builtin keyword */ WHILE, DO, IF, THEN, ELSE, END, FOR, TO, DOWNTO, CONST, READ, WRITE, DIV, MOD, AND, OR, TRUE, FALSE, NOT, 
-                /* Special symbols */ SEMICOLON, COMMA, ASSIGNMENT, COLON, LEFT_SQUARE_BRACKET, RIGHT_SQUARE_BRACKET, DOT_DOT, DOT, LEFT_BRACKET, RIGHT_BRACKET, STAR, SLASH, PLUS, MINUS, UNEQUAL, LESS_THAN, GREATER_THAN, GREATER_EQUAL_THAN, LESS_EQUAL_THAN, EQUAL, STRING, 
-                /* Numbers */ NUMBER, 
+%token		/* Keywords */ PROGRAM VAR INTEGER ARRAY OF REAL BOOLEAN _BEGIN /* BEGIN is already a builtin keyword */ WHILE DO IF THEN ELSE END FOR TO DOWNTO READ WRITE DIV MOD AND OR TRUE FALSE NOT 
+                /* Special symbols */ SEMICOLON COMMA ASSIGNMENT COLON LEFT_SQUARE_BRACKET RIGHT_SQUARE_BRACKET DOT_DOT DOT LEFT_BRACKET RIGHT_BRACKET STAR SLASH PLUS MINUS UNEQUAL LESS_THAN GREATER_THAN GREATER_EQUAL_THAN LESS_EQUAL_THAN EQUAL STRING 
+                /* Numbers */ NUMBER 
                 /* Identifiers */ ID
-
+			
 %start	        start
+
+%right THEN ELSE
 
 %%
 
 // Grammar from homework 4
-start                   : PROGRAM ID SEMICOLON varDec DOT
+start                   : PROGRAM ID SEMICOLON varDec compStmt DOT
                         ;
 
 varDec 		        : VAR varDecList 
@@ -42,7 +43,7 @@ simpleType	        : INTEGER
                         | BOOLEAN
                         ;
  
-compStmt	        : BEGIN stmtList END
+compStmt	        : _BEGIN stmtList END
                         ;
 
 stmtList                : stmtList SEMICOLON statement 
@@ -59,13 +60,11 @@ statement	        : assignStmt
                         ;
 
 assignStmt              : ID ASSIGNMENT expr 
-                        | ID LEFT_SQUATE_BRACKET expr RIGHT_SQUARE_BRACKET ASSIGNMENT expr
+                        | ID LEFT_SQUARE_BRACKET expr RIGHT_SQUARE_BRACKET ASSIGNMENT expr
                         ;
  
-ifStmt		        : IF expr THEN statement LEFT_SQUARE_BRACKET elsePart RIGHT_SQUARE_BRACKET
-                        ;
- 
-elsePart	        : ELSE statement
+ifStmt		        : IF expr THEN statement
+                        | IF expr THEN statement ELSE statement	
                         ;
  
 whileStmt	        : WHILE expr DO statement
@@ -98,8 +97,8 @@ term                    : term mulOp factor
 factor		        : NUMBER
 		        | FALSE
 		        | TRUE
-		        | IDENT
-                        | IDENT LEFT_SQUARE_BRACKET expr RIGHT_SQUARE_BRACKET	
+		        | ID
+                        | ID LEFT_SQUARE_BRACKET expr RIGHT_SQUARE_BRACKET	
 		        | NOT factor
 		        | MINUS factor
 		        | LEFT_BRACKET expr RIGHT_BRACKET
@@ -133,7 +132,6 @@ main() {
 }
 
 int yyerror(char *s) {
-    fprintf(stderr, "%s\n", s);
+    fprintf(stderr, "Syntactic error (line %d): \"%s\"\n", yylineno, s);
     return 0;
 }
-
