@@ -4,14 +4,14 @@ CC = gcc
 
 all: parser
 
-parser: lex.yy.c grammar.tab.c
-	$(CC) -o parser grammar.tab.c lex.yy.c
+parser: lex.yy.c parser.tab.c
+	$(CC) -o parser parser.tab.c lex.yy.c
 
-lex.yy.c: scanner.l grammar.tab.c
+lex.yy.c: scanner.l parser.tab.c
 	$(LEX) scanner.l
 
-grammar.tab.c: grammar.y
-	$(YACC) -d grammar.y
+parser.tab.c: parser.y
+	$(YACC) -d parser.y
 
 clean:
-	rm -f grammar.tab.* lex.yy.c parser
+	rm -f parser.tab.* lex.yy.c parser

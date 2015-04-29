@@ -1,8 +1,9 @@
 %{
 #include <stdio.h>
+#include "parser.tab.h"
 
-#include "grammar.tab.h"
-
+void yyerror(char *);
+char message[100];
 %}
 
 %option noyywrap
@@ -46,7 +47,7 @@ Z [zZ]
 "{"                  BEGIN(COMMENT);
 <COMMENT>[^}\n]+     ;
 <COMMENT>\n          ;
-<COMMENT><<EOF>>     yyerror("EOF in COMMENT");
+<COMMENT><<EOF>>     sprintf(message, "Lexical Error (Line: %d) EOF in comment", yylineno); yyerror(message);
 <COMMENT>"}"         BEGIN(INITIAL);
 
     /* Keywords */
@@ -111,6 +112,6 @@ Z [zZ]
 {WHITESPACE}+                           ;
 
     /* Lexical errors */
-.                                       yyerror("Illegal input");
+.                                       sprintf(message, "Lexical Error (Line: %d) Illegal input", yylineno); yyerror(message);
 
 %%

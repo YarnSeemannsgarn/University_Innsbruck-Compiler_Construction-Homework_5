@@ -1,6 +1,7 @@
 %{ 
 #include <stdio.h>
 
+void yyerror(char *);
 %}
 
 // Tokens from homework 4
@@ -11,6 +12,8 @@
 			
 %start	        start
 
+// see http://www.gnu.org/software/bison/manual/html_node/Shift_002fReduce.html
+// see http://www.gnu.org/software/bison/manual/html_node/Non-Operators.html#Non-Operators
 %right THEN ELSE
 
 %%
@@ -127,11 +130,16 @@ mulOp		        : STAR
 
 %%
 
-main() {
-    return yyparse();
+void yyerror(char *s) {
+    extern int yylineno;
+    extern char *yytext;
+    fprintf(stderr, "%s (line %d): \"%s\"\n", s, yylineno, yytext);
 }
 
-int yyerror(char *s) {
-    fprintf(stderr, "%s\n", s);
-    return 0;
+int main() {
+    int status = yyparse();
+    if (!status) {
+        printf("parsing successful\n");
+    }
+    return status;
 }
