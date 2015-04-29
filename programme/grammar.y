@@ -132,6 +132,6 @@ main() {
 }
 
 int yyerror(char *s) {
-    fprintf(stderr, "Syntactic error (line %d): \"%s\"\n", yylineno, s);
+    fprintf(stderr, "%s\n", s);
     return 0;
 }
